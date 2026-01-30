@@ -12,5 +12,5 @@ diffusion:
 
 train:
   batch_size: 16    # GPU 메모리에 맞춰 조절
-  lr: 1e-4           # 학습률
+  lr: 1e-5           # 학습률
   epochs: 100        # 최소한의 형태가 잡히는 시점
