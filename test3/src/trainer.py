@@ -53,4 +53,4 @@ class Trainer:
 
             if (epoch+1) % 10 == 0:
                 if self.accelerator.is_main_process:
-                    torch.save(self.model.state_dict(), CHECK_DIR / f"model_epoch_{epoch+1}.pth")
+                    torch.save(self.model.module.state_dict(), CHECK_DIR / f"model_epoch_{epoch+1}.pth")
