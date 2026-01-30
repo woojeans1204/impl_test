@@ -1,0 +1,24 @@
+# 데이터셋 (가장 중요)
+data/
+datasets/
+*.zip
+*.tar.gz
+
+# 학습 결과물 및 모델 체크포인트
+outputs/
+checkpoints/
+*.pth
+*.pt
+*.ckpt
+*.h5
+
+# 가상환경 및 캐시
+.venv/
+env/
+__pycache__/
+.ipynb_checkpoints/
+.DS_Store
+
+# 로그 파일
+logs/
+*.log
