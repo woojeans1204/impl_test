@@ -8,7 +8,6 @@ def main():
     parser = argparse.ArgumentParser(description="Train Diffusion Model")
     parser.add_argument("--config", type=str, default=CONFIG_DIR/"config.yml")
     args = parser.parse_args()
-
     with open(CONFIG_DIR/args.config, "r") as f:
         config = yaml.safe_load(f)
 

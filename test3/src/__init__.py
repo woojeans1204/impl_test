@@ -9,3 +9,6 @@ CHECK_DIR = ROOT_DIR / "checkpoints"
 # 확인용 출력
 if __name__ == "__main__":
     print(f"Project Root: {ROOT_DIR}")
+
+def is_acc(model):
+    return hasattr(model, 'module')

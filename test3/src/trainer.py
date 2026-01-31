@@ -6,8 +6,9 @@ import os
 from .model import SimpleUNet
 from .diffusion import GaussianDiffusion
 from .dataset import get_dataloader
-from .__init__ import CHECK_DIR
+from .__init__ import *
 from accelerate import Accelerator
+from .ema import EMA
 
 class Trainer:
     def __init__(self, config):
@@ -26,6 +27,9 @@ class Trainer:
         # 가속기 설정
         self.accelerator = Accelerator(mixed_precision='fp16')
         self.model, self.optimizer, self.dataloader = self.accelerator.prepare(self.model, self.optimizer, self.dataloader)
+        
+        # ema
+        self.ema = EMA(self.accelerator.unwrap_model(self.model), beta=0.9999)
 
     
     def train(self):
@@ -50,7 +54,9 @@ class Trainer:
 
                 if self.accelerator.is_main_process:
                     pbar.set_postfix(loss=loss.item())
+                    self.ema.update(self.accelerator.unwrap_model(self.model))
 
             if (epoch+1) % 10 == 0:
                 if self.accelerator.is_main_process:
-                    state_dict = self.model.module.state_dict() if hasattr(self.model, 'module') else self.model.state_dict()
+                    state_dict = self.ema.get_model().state_dict()
+                    torch.save(self.ema.get_model().state_dict(), CHECK_DIR / f"model_epoch_{epoch+1}.pth")

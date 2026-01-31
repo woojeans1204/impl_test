@@ -26,14 +26,21 @@ def sample():
     with torch.no_grad():
         batch_size = 16
         img_size = config['data']['image_size']
-        img = torch.randn((batch_size, 3, img_size, img_size), device=device)
-
+        img = torch.randn((batch_size, 3, img_size, img_size), device=device).float()
+        
         for i in reversed(range(0, diffusion.timesteps)):
             t = torch.full((batch_size, ), i, device=device, dtype=torch.long)
             img = diffusion.p_sample(model, img, t, i)
-        
+
+            # [디버깅 코드 1] 중간 단계에서 값이 발산하는지 확인
+            if i % 100 == 0:
+                print(f"Step {i}: min={img.min().item():.4f}, max={img.max().item():.4f}")
+
+        # [디버깅 코드 2] 최종 값을 강제로 [-1, 1]로 자르기 (발산 방지)
+        # img = torch.clamp(img, -1.0, 1.0)
+
         os.makedirs(OUTPUT_DIR, exist_ok=True)
-        save_image(img, OUTPUT_DIR/"output.png", nrow=4, normalize=True)
+        save_image(img, OUTPUT_DIR/"output.png", nrow=4, normalize=True, value_range=(-1, 1))
         print("Sampling 완성")
 
 
