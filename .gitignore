@@ -11,6 +11,7 @@ checkpoints/
 *.pt
 *.ckpt
 *.h5
+results/
 
 # 가상환경 및 캐시
 .venv/
