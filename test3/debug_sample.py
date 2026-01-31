@@ -15,7 +15,9 @@ def sample():
     model = SimpleUNet(dim=config['model']['dim'], in_out_ch=config['data']['channels']).to(device)
     diffusion = GaussianDiffusion(timesteps=config['diffusion']['timesteps'])
 
-    checkpoint_path = CHECK_DIR/"model_epoch_20.pth"
+    num = int(input("체크포인트: "))
+    # checkpoint_path = CHECK_DIR/f"raw_model_epoch_{num}.pth"
+    checkpoint_path = CHECK_DIR/f"model_epoch_{num}.pth"
     if os.path.exists(checkpoint_path):
         model.load_state_dict(torch.load(checkpoint_path, map_location=device))
         print(f"Loaded {checkpoint_path}")

@@ -1,0 +1,15 @@
+experiment_name: "cifar10_exp2_baseline_ddpm"
+data:
+  image_size: 32
+  channels: 3
+model:
+  dim: 128
+  type: "ddpm"      # [변경] 정석 모델 사용
+diffusion:
+  timesteps: 1000
+train:
+  batch_size: 64    # [변경] 모델이 커서 메모리 부족할 수 있으니 배치를 줄임
+  lr: 2e-4
+  epochs: 50
+  save_interval: 10
+  ema_beta: 0.995

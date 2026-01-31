@@ -1,0 +1,15 @@
+experiment_name: "cifar10_exp8_tiny"
+data:
+  image_size: 32
+  channels: 3
+model:
+  dim: 64           # [변경] 아주 얇은 모델
+  type: "simple"
+diffusion:
+  timesteps: 1000
+train:
+  batch_size: 256   # [변경] 배치를 크게 키움
+  lr: 5e-4          # [변경] 모델이 작으니 학습률을 좀 과감하게
+  epochs: 50
+  save_interval: 10
+  ema_beta: 0.995

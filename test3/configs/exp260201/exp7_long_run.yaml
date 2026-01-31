@@ -1,0 +1,15 @@
+experiment_name: "cifar10_exp7_long_run"
+data:
+  image_size: 32
+  channels: 3
+model:
+  dim: 128
+  type: "ddpm"
+diffusion:
+  timesteps: 1000
+train:
+  batch_size: 64
+  lr: 2e-4
+  epochs: 200       # [변경] 진득하게 오래 돌리기
+  save_interval: 20 # [변경] 저장을 좀 띄엄띄엄
+  ema_beta: 0.995

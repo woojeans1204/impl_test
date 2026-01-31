@@ -1,0 +1,15 @@
+experiment_name: "cifar10_exp10_best_mix"
+data:
+  image_size: 32
+  channels: 3
+model:
+  dim: 128
+  type: "ddpm"      # 정석 모델
+diffusion:
+  timesteps: 1000
+train:
+  batch_size: 64
+  lr: 2e-4          # 국룰 LR
+  epochs: 150       # 충분한 시간
+  save_interval: 10
+  ema_beta: 0.999   # 부드러운 결과

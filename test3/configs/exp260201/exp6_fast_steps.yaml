@@ -1,0 +1,15 @@
+experiment_name: "cifar10_exp6_fast_steps"
+data:
+  image_size: 32
+  channels: 3
+model:
+  dim: 128
+  type: "simple"
+diffusion:
+  timesteps: 500    # [변경] 단계를 절반으로 줄임
+train:
+  batch_size: 128
+  lr: 2e-4
+  epochs: 50
+  save_interval: 10
+  ema_beta: 0.995

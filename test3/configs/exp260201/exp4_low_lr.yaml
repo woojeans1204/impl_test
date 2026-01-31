@@ -1,0 +1,15 @@
+experiment_name: "cifar10_exp4_low_lr"
+data:
+  image_size: 32
+  channels: 3
+model:
+  dim: 128
+  type: "ddpm"
+diffusion:
+  timesteps: 1000
+train:
+  batch_size: 64
+  lr: 1e-4          # [변경] 조금 더 천천히 학습
+  epochs: 80        # [변경] 대신 에포크를 늘림
+  save_interval: 10
+  ema_beta: 0.995

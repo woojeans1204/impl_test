@@ -109,7 +109,7 @@ class Upsample(nn.Module):
         x = F.interpolate(x, scale_factor=2, mode="nearest")
         return self.conv(x)
 
-class SimpleUNet(nn.Module):
+class DDPMUNet(nn.Module):
     """
     인터페이스는 그대로 유지하되, 내부는 Original DDPM 아키텍처 구현
     CIFAR-10 표준 설정:

@@ -1,0 +1,15 @@
+experiment_name: "cifar10_exp5_high_ema"
+data:
+  image_size: 32
+  channels: 3
+model:
+  dim: 128
+  type: "ddpm"
+diffusion:
+  timesteps: 1000
+train:
+  batch_size: 64
+  lr: 2e-4
+  epochs: 50
+  save_interval: 10
+  ema_beta: 0.999   # [변경] 더 부드러운 가중치 업데이트

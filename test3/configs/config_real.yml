@@ -1,16 +1,19 @@
-experiment_name: "cifar10_v1"
+experiment_name: "cifar10_v1" #실험이름
 
 data:
   image_size: 32     # 모델 구조(UNet)와 직결 (반드시 필요)
   channels: 3        # 1(흑백) -> 3(컬러)로 변경 (반드시 필요)
 
 model:
-  dim: 128            # 모델의 기본 두께 (Size Mismatch 방지용)
+  dim: 128           # 모델의 기본 두께 (Size Mismatch 방지용)
+  type: "simple"     # 모델 타입 (simple or ddpm)
 
 diffusion:
   timesteps: 1000    # 확산 단계 (성능의 기본값)
 
 train:
-  batch_size: 128    # GPU 메모리에 맞춰 조절
-  lr: 2e-6           # 학습률
-  epochs: 100        # 최소한의 형태가 잡히는 시점
+  batch_size: 64    # GPU 메모리에 맞춰 조절
+  lr: 2e-7           # 학습률
+  epochs: 50         # 최소한의 형태가 잡히는 시점
+  save_interval: 5
+  ema_beta: 0.995    # ema (지수 이동 평균 beta 값)

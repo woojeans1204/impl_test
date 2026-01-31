@@ -1,0 +1,15 @@
+experiment_name: "cifar10_exp1_baseline_simple"
+data:
+  image_size: 32
+  channels: 3
+model:
+  dim: 128
+  type: "simple"
+diffusion:
+  timesteps: 1000
+train:
+  batch_size: 128
+  lr: 2e-4          # [중요] 정상 학습률
+  epochs: 100
+  save_interval: 10
+  ema_beta: 0.995

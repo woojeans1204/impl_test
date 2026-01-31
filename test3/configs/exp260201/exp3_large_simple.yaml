@@ -1,0 +1,15 @@
+experiment_name: "cifar10_exp3_large_simple"
+data:
+  image_size: 32
+  channels: 3
+model:
+  dim: 256          # [변경] 128 -> 256 (뚱뚱한 모델)
+  type: "simple"
+diffusion:
+  timesteps: 1000
+train:
+  batch_size: 64    # [변경] 메모리 확보를 위해 배치를 줄임
+  lr: 2e-4
+  epochs: 50
+  save_interval: 10
+  ema_beta: 0.995

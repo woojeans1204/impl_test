@@ -6,11 +6,13 @@ data:
 
 model:
   dim: 128            # 모델의 기본 두께 (Size Mismatch 방지용)
+  type: "simple"
 
 diffusion:
   timesteps: 1000    # 확산 단계 (성능의 기본값)
 
 train:
-  batch_size: 16    # GPU 메모리에 맞춰 조절
-  lr: 1e-5           # 학습률
-  epochs: 100        # 최소한의 형태가 잡히는 시점
+  batch_size: 128    # GPU 메모리에 맞춰 조절
+  lr: 2e-7           # 학습률
+  epochs: 50        # 최소한의 형태가 잡히는 시점
+  ema_beta: 0.995

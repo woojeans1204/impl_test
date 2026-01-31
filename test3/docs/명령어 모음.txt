@@ -1,0 +1,10 @@
+# logs 폴더가 있는 경로에서 실행
+tensorboard --logdir .
+
+# 1. 경로 이동
+cd /scratch/x3326a36/impl_test/test3
+source /home01/x3326a36/miniconda3/etc/profile.d/conda.sh
+conda activate study
+conda env list
+
+accelerate launch --num_processes 4 train.py --config config_real.yml

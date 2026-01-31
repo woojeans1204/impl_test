@@ -1,0 +1,15 @@
+experiment_name: "cifar10_exp9_high_quality"
+data:
+  image_size: 32
+  channels: 3
+model:
+  dim: 192          # [변경] 128과 256 사이의 타협점
+  type: "ddpm"
+diffusion:
+  timesteps: 1000
+train:
+  batch_size: 64
+  lr: 2e-4
+  epochs: 100
+  save_interval: 10
+  ema_beta: 0.999   # 고퀄리티에는 높은 EMA가 필수
