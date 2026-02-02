@@ -72,7 +72,7 @@ def get_last_epoch(log_path):
 # [수정 1] 모니터링 함수: 현재/전체 에포크 파싱하여 표시
 def status_monitor(finished_count, total_count, start_time, worker_status):
     while True:
-        time.sleep(1800) # 1시간마다
+        time.sleep(1800) # 30분마다
         
         current_done = finished_count.value
         elapsed = datetime.now() - start_time
