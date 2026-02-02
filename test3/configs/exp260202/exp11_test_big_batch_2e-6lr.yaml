@@ -1,4 +1,4 @@
-experiment_name: "cifar10_big_batchs_small_lr"
+experiment_name: "cifar10_big_batchs_2e-6"
 data:
   image_size: 32
   channels: 3

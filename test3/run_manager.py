@@ -9,6 +9,9 @@ from dotenv import load_dotenv
 import re
 import yaml
 
+os.environ['TZ'] = 'Asia/Seoul'
+if hasattr(time, 'tzset'):
+    time.tzset()
 load_dotenv()
 # ====================================================
 # [설정] 경로 및 환경 설정

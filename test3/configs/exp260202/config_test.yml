@@ -1,4 +1,4 @@
-experiment_name: "cifar10_v1"
+experiment_name: "config_test"
 
 data:
   image_size: 32     # 모델 구조(UNet)와 직결 (반드시 필요)
