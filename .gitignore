@@ -23,3 +23,6 @@ __pycache__/
 # 로그 파일
 logs/
 *.log
+
+# 보안 파일 무시
+.env

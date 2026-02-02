@@ -196,7 +196,7 @@ class Trainer:
         
         # 파일명: ckpt_epoch_0010.pth
         filename = self.ckpt_dir / f"ckpt_epoch_{epoch:04d}.pth"
-        torch.save(state, filename)
+        # torch.save(state, filename)
         
         # 최신 파일 갱신 (resume용)
         torch.save(state, self.ckpt_dir / "last.pth")

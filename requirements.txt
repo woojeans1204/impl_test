@@ -6,3 +6,4 @@ pyyaml
 accelerate
 requests
 tensorboard
+python-dotenv

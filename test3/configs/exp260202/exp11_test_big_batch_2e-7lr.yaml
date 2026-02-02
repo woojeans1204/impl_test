@@ -1,0 +1,15 @@
+experiment_name: "cifar10_big_batchs"
+data:
+  image_size: 32
+  channels: 3
+model:
+  dim: 128
+  type: "simple"
+diffusion:
+  timesteps: 1000
+train:
+  batch_size: 256   # [변경] 64 -> 256 (학습 속도 향상 & 안정성)
+  lr: 2e-7          # 국룰 LR
+  epochs: 1000       
+  save_interval: 50 # (선택사항) 에폭이 많으니 저장 주기를 좀 늘리는 게 좋습니다
+  ema_beta: 0.999   # 부드러운 결과
