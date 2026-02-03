@@ -6,6 +6,7 @@ import yaml
 from datetime import datetime
 from pathlib import Path
 from torchvision.utils import save_image # 이미지 저장을 위해 추가
+import copy
 
 from .model import DDPMUNet
 from .model_simple import SimpleUNet
@@ -86,14 +87,31 @@ class Trainer:
         try:
             with open(saved_config_path, 'r') as f:
                 saved_conf = yaml.safe_load(f)
+            # 1. 비교를 위해 복사본을 만듭니다 (원본 데이터를 지우면 안 되니까)
+            saved_copy = copy.deepcopy(saved_conf)
+            current_copy = copy.deepcopy(self.config)
+
+            # 2. 양쪽 설정에서 'epochs' 정보만 쏙 빼버립니다.
+            # (pop(키, None)을 쓰면 키가 없어도 에러가 안 납니다)
+            if 'train' in saved_copy:
+                saved_copy['train'].pop('epochs', None)
             
+            if 'train' in current_copy:
+                current_copy['train'].pop('epochs', None)
+
+            if 'train' in saved_copy:
+                saved_copy['train'].pop('save_interval', None)
+            
+            if 'train' in current_copy:
+                current_copy['train'].pop('save_interval', None)
+
             # 1. 1차 단순 비교
-            if saved_conf == self.config:
+            if saved_copy == current_copy:
                 return True
             
             # 2. 다르다면 상세 비교 수행 (디버깅용)
             print(f"\n>>> [Config Mismatch Detected] Diff Report:")
-            self._compare_dicts(saved_conf, self.config)
+            self._compare_dicts(saved_copy, current_copy)
             print("------------------------------------------\n")
             
             return False
