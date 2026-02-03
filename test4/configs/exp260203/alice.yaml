@@ -18,7 +18,7 @@ diffusion:
 
 # [학습 설정]
 train:
-  batch_size: 64
+  batch_size: 1024
   lr: 0.001
   epochs: 200
   save_interval: 10
