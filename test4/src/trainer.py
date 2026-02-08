@@ -155,7 +155,7 @@ class Trainer:
                 raw_model = self.accelerator.unwrap_model(self.model)
                 
                 # Ground Truth: 정수 ID -> 임베딩 벡터
-                x_start = raw_model.token_emb(indices) 
+                x_start = raw_model.get_embeds(indices) 
                 
                 batch_size = x_start.shape[0]
                 t = torch.randint(0, self.diffusion.timesteps, (batch_size,), device=self.device).long()
@@ -167,8 +167,19 @@ class Trainer:
                 # 2. Reverse Process Prediction
                 predicted_noise = self.model(x_noisy, t)
                 
+                sqrt_alpha_bar = self.diffusion._extract(self.diffusion.sqrt_alphas_cumprod, t, x_noisy.shape)
+                sqrt_one_minus_alpha_bar = self.diffusion._extract(self.diffusion.sqrt_one_minus_alphas_cumprod, t, x_noisy.shape)
+                predicted_x_start = (x_noisy - sqrt_one_minus_alpha_bar * predicted_noise) / sqrt_alpha_bar
+
                 # 3. Optimization
-                loss = F.mse_loss(predicted_noise, noise)
+                loss_mse = F.mse_loss(predicted_noise, noise)
+                raw_model = self.accelerator.unwrap_model(self.model)
+
+                logits = torch.matmul(predicted_x_start, raw_model.token_emb.weight.T) # (B, L, V)
+                
+                loss_ce = F.cross_entropy(logits.view(-1, logits.size(-1)), indices.view(-1))
+
+                loss = loss_mse + 1.0*loss_ce
                 current_loss = loss.item()
 
                 self.optimizer.zero_grad()

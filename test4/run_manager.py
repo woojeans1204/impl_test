@@ -21,7 +21,7 @@ PROJECT_REL_PATH = "impl_test/test4"
 PROJECT_FULL_PATH = os.path.join(BASE_DIR, PROJECT_REL_PATH)
 CONFIGS_FULL_PATH = os.path.join(PROJECT_FULL_PATH, "configs")
 
-CONFIG_DIR = "exp260203"
+CONFIG_DIR = "exp260208"
 LOG_BASE_DIR = os.path.join(BASE_DIR, "logs")
 EXP_LIST_FILE = "experiment_list.conf"
 NUM_GPUS = int(os.getenv("NUM_GPUS", 1))

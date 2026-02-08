@@ -39,7 +39,10 @@ class TextDiffusionTransformer(nn.Module):
         # 이 레이어는 Diffusion 과정 자체에는 참여하지 않지만, 
         # 정수(Index)를 벡터로 바꿀 때 Trainer에서 호출됩니다.
         self.token_emb = nn.Embedding(vocab_size, dim)
+        self.token_emb.weight.requires_grad = False
         
+        self.emb_norm = nn.LayerNorm(dim, elementwise_affine=False)
+
         # 2. Positional Embedding (Learnable)
         self.pos_emb = nn.Parameter(torch.randn(1, seq_len, dim))
         
@@ -68,7 +71,14 @@ class TextDiffusionTransformer(nn.Module):
         # 들어온 차원 그대로 나갑니다 (Predicted Noise)
         self.final_norm = nn.LayerNorm(dim)
         self.final_linear = nn.Linear(dim, dim)
-
+        
+    # Trainer에서 호출할 때 사용
+    def get_embeds(self, indices):
+        x = self.token_emb(indices)
+        x = self.emb_norm(x)
+        # x = x * math.sqrt(self.dim)
+        return x # 여기서 항상 정규화된 벡터가 나옴
+    
     def forward(self, x, t):
         """
         x: (Batch, Seq_Len, Dim) <- 노이즈가 섞인 임베딩 벡터
