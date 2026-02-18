@@ -182,17 +182,30 @@ def worker(worker_id, task_queue, finished_count, lock, worker_status):
         print(f"✅ [Worker {worker_id}] 종료: {config_file}") # 종료 시 출력
 
 def main():
-    start_time = datetime.now() 
-    send_slack_msg(f"🎬 [Cluster] 스케줄러 가동 시작\n- 시간: {start_time.strftime('%Y-%m-%d %H:%M:%S')}")
-
+    start_time = datetime.now()
     os.makedirs(LOG_BASE_DIR, exist_ok=True)
     
+    # 1. 실험 리스트 먼저 로드
     tasks = []
     if os.path.exists(EXP_LIST_FILE):
         with open(EXP_LIST_FILE, 'r') as f:
             tasks = [l.strip() for l in f if l.strip() and not l.startswith("#")]
     else:
+        send_slack_msg(f"❌ [Error] 실험 리스트 파일({EXP_LIST_FILE})을 찾을 수 없습니다.")
         return
+
+    # 2. 상세 정보 포함하여 시작 알림 전송
+    task_list_str = "\n".join([f"• `{t}`" for t in tasks])
+    
+    start_msg = (
+        f"🎬 *[Cluster] 스케줄러 가동 시작*\n"
+        f"━━━━━━━━━━━━━━━━━━\n"
+        f"📅 시작 시간: {start_time.strftime('%Y-%m-%d %H:%M:%S')}\n"
+        f"⚡ 할당 자원: 총 {NUM_GPUS} GPU / {NUM_WORKERS} Worker\n"
+        f"📋 실험 대기열 ({len(tasks)}개):\n"
+        f"{task_list_str}"
+    )
+    send_slack_msg(start_msg)
 
     total_tasks = len(tasks)
     task_queue = multiprocessing.Queue()
