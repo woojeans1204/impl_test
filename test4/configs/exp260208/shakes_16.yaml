@@ -19,5 +19,5 @@ diffusion:
 train:
   batch_size: 64     # 텍스트는 가벼워서 128~256도 가능 (VRAM 따라 조절)
   lr: 1e-3          # Transformer는 보통 1e-3 or 5e-4 정도로 시작
-  epochs: 100        # 텍스트는 금방 돌아서 에포크를 많이 잡습니다
+  epochs: 400        # 텍스트는 금방 돌아서 에포크를 많이 잡습니다
   save_interval: 5  # 10 에포크마다 저장

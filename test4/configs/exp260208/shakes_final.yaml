@@ -1,11 +1,11 @@
-experiment_name: "shakespeare_batch_128"
+experiment_name: "shakespeare_final"
 
 # [데이터 설정] 이미지 사이즈 대신 시퀀스 길이 필요
 data:
   dataset: "shakespeare" # 셰익스피어 데이터셋
 
 model:
-  seq_len: 64        # 한 번에 볼 문자의 길이 (매우 중요)
+  seq_len: 32        # 한 번에 볼 문자의 길이 (매우 중요)
   dim: 128           # 임베딩 차원
   depth: 6           # 트랜스포머 레이어 수
   heads: 4           # 어텐션 헤드 수
@@ -17,7 +17,7 @@ diffusion:
 
 # [학습 설정]
 train:
-  batch_size: 128     # 텍스트는 가벼워서 128~256도 가능 (VRAM 따라 조절)
-  lr: 1e-1          # Transformer는 보통 1e-3 or 5e-4 정도로 시작
+  batch_size: 32     # 텍스트는 가벼워서 128~256도 가능 (VRAM 따라 조절)
+  lr: 1e-2          # Transformer는 보통 1e-3 or 5e-4 정도로 시작
   epochs: 400        # 텍스트는 금방 돌아서 에포크를 많이 잡습니다
   save_interval: 5  # 10 에포크마다 저장

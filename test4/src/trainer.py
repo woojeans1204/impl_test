@@ -179,7 +179,7 @@ class Trainer:
                 
                 loss_ce = F.cross_entropy(logits.view(-1, logits.size(-1)), indices.view(-1))
 
-                loss = loss_mse + 1.0*loss_ce
+                loss = loss_mse + 50*loss_ce
                 current_loss = loss.item()
 
                 self.optimizer.zero_grad()
