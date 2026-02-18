@@ -8,3 +8,5 @@ requests
 tensorboard
 python-dotenv
 tiktoken
+datasets
+transformers

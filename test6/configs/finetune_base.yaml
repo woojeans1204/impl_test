@@ -1,0 +1,30 @@
+# [시스템 설정]
+system:
+  experiment_name: "nanogpt_alpaca_finetune"  # 여기에 결과가 저장됨 (체크포인트, 로그 등)
+  seed: 1337
+
+# [데이터 설정]
+data:
+  data_dir: "data/alpaca"
+
+# [모델 설정] (GPT-2 Small)
+model:
+  block_size: 1024
+  vocab_size: 50257
+  n_layer: 12
+  n_head: 12
+  n_embd: 768
+  dropout: 0.1
+  bias: true
+
+# [학습 설정]
+train:
+  epochs: 3
+  save_interval: 1
+  batch_size: 8
+  learning_rate: 1e-5
+  min_lr: 1e-6
+  weight_decay: 0.01
+  grad_clip: 1.0
+  beta1: 0.9
+  beta2: 0.99
