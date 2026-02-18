@@ -7,4 +7,4 @@ accelerate
 requests
 tensorboard
 python-dotenv
-tikitoken
+tiktoken
