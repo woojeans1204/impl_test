@@ -1,135 +1,165 @@
-기존 Diffusion 프로젝트의 체계적인 실험 관리 구조(`run_manager.py`, `configs/` 등)를 그대로 살리면서, 코어 엔진만 **NanoGPT**로 교체한 형태의 `README.md`입니다.
+현재까지 진행된 **Pre-training(사전 학습)** 단계에 대한 `README.md` 초안입니다.
 
-`src/diffusion.py`는 제거하거나 `src/model.py`로 기능이 통합된 것으로 가정하고 작성했습니다.
-
-conda create -n study python=3.10 -y
-conda activate study
-pip install -r requirements.txt
+프로젝트의 발전 과정(Shakespeare → TinyStories → FineWeb-Edu)과 현재 구축된 파일 시스템 구조를 명확하게 반영하여 작성했습니다. 이 파일을 프로젝트 최상단(`readme.md`)에 저장하시면 됩니다.
 
 ---
 
-# NanoGPT V100 Framework
+# 🧠 Custom NanoGPT: Pre-training Phase
 
-이 프로젝트는 기존의 실험 관리 프레임워크를 기반으로, **NVIDIA V100** 환경에서 **GPT(Decoder-only Transformer)** 모델을 바닥부터(Scratch) 학습시키기 위해 재구성되었습니다.
-
-## ⚡ Key Features
-
-* **Structure Inheritance:** 기존 Diffusion 프로젝트의 `run_manager`와 `YAML` 기반 설정 관리 시스템을 그대로 사용하여 실험의 재현성과 관리를 용이하게 함.
-* **V100 Optimization:** PyTorch 2.0 `F.scaled_dot_product_attention` 및 `Mixed Precision (AMP)`을 적용하여 V100에서 학습 속도 극대화.
-* **Custom Trainer:** 이미지 생성 로직을 텍스트 생성(Next Token Prediction) 로직으로 전면 교체.
+이 프로젝트는 GPT(Generative Pre-trained Transformer) 모델을 바닥부터 구현하고, 단계별 데이터셋을 통해 사전 학습(Pre-training)을 수행한 기록입니다. **Andrej Karpathy의 NanoGPT**를 기반으로 하며, 다중 GPU 환경(`Accelerate`)과 대용량 데이터셋 처리에 최적화되어 있습니다.
 
 ## 📂 Project Structure
 
+현재 프로젝트의 디렉토리 구조입니다.
+
 ```text
-.
-├── configs/                 # 실험별 하이퍼파라미터 설정 (YAML)
-│   ├── base.yaml            # 기본 설정
-│   └── exp_v100/            # V100 최적화 실험군
-├── data/                    # 텍스트 데이터셋 및 전처리 스크립트
-│   └── tinystories/         # 예: TinyStories 데이터
-├── results/                 # 실험 결과 (Logs, Checkpoints, Samples)
-├── src/                     # 핵심 소스 코드
-│   ├── __init__.py
-│   ├── dataset.py           # 텍스트 데이터 로더 (np.memmap 기반)
-│   ├── model.py             # GPT 아키텍처 (CausalSelfAttention, MLP)
-│   ├── trainer.py           # 학습 루프 & 텍스트 생성 평가 로직
-│   └── utils.py             # 시드 고정, 로깅 등 유틸리티
-├── experiment_list.conf     # run_manager가 실행할 실험 목록
-├── run_manager.py           # 실험 스케줄러 & 실행 관리자
-├── train.py                 # 단일 실험 실행 진입점 (Entry Point)
-└── .env                     # 환경 변수 (WandB API Key 등)
+├── configs/               # 실험별 하이퍼파라미터 설정 (YAML)
+│   └── exp260218/         # 2026-02-18 실험군
+│       ├── base.yaml      # 기본 설정
+│       ├── stories.yaml   # TinyStories용 설정
+│       └── fineweb.yaml   # FineWeb-Edu용 설정
+├── data/                  # 학습 데이터 및 전처리 스크립트
+│   ├── shakespeare/       # (Step 1) 문자/단어 단위 기초 학습
+│   ├── tinystories/       # (Step 2) 기초 문법 및 이야기 구조 학습
+│   └── fineweb/           # (Step 3) 일반 상식 및 논리 학습 (Current)
+├── results/               # 학습 결과물 (체크포인트, 로그, 샘플)
+│   ├── shakespeare_gpt_v1
+│   ├── tinystories_gpt_v1
+│   └── fineweb_gpt_v2     # 현재 메인 실험 결과
+├── src/                   # 핵심 소스 코드
+│   ├── model.py           # GPT 모델 아키텍처 (PyTorch)
+│   ├── trainer.py         # 학습 루프, 체크포인트, 샘플링 로직
+│   └── dataset.py         # 대용량 데이터 로더 (Memory mapping)
+├── train.py               # 단일 실험 실행 스크립트
+├── run_manager.py         # 실험 스케줄러 (순차적 실험 실행)
+├── inference.py           # 텍스트 생성(Inference) 스크립트
+└── experiment_list.conf   # run_manager가 실행할 실험 목록
 
 ```
 
-## 🚀 Getting Started
+---
 
-### 1. Environment Setup
+## 🚀 Quick Start
+
+### 1. Dependencies
+
+필요한 라이브러리를 설치합니다.
 
 ```bash
-# 가상 환경 생성 및 필수 패키지 설치
-pip install torch numpy pyyaml tqdm wandb
+pip install torch numpy transformers datasets tiktoken accelerate pyyaml tqdm
 
 ```
 
 ### 2. Data Preparation
 
-NanoGPT는 학습 속도를 위해 텍스트 데이터를 바이너리(`uint16`) 형태로 미리 전처리합니다.
+데이터셋 크기에 따라 단계별로 전처리를 수행합니다. 전처리 결과는 `.bin` (uint16) 형태로 저장됩니다.
+
+**Step 1: Shakespeare (Char/Word level)**
+가벼운 테스트용입니다.
 
 ```bash
-cd data/tinystories
-python prepare.py  # train.bin, val.bin 생성
+python data/shakespeare/prepare_gptT.py
 
 ```
 
-### 3. Configuration (`configs/*.yaml`)
+**Step 2: TinyStories (Narrative)**
+문법과 기초적인 스토리텔링을 학습합니다.
 
-GPT 모델 사이즈와 학습 설정을 정의합니다. (기존 UNet 설정 대신 Transformer 설정 사용)
-
-```yaml
-model:
-  n_layer: 6
-  n_head: 6
-  n_embd: 384
-  block_size: 256
-  dropout: 0.0
-
-train:
-  batch_size: 64
-  learning_rate: 1e-3
-  max_iters: 5000
-  weight_decay: 0.1 # V100 학습 안정성 핵심
+```bash
+python data/tinystories/prepare_tinystories.py
 
 ```
 
-### 4. Training
-
-#### 단일 실험 실행 (`train.py`)
+**Step 3: FineWeb-Edu (Knowledge & Reasoning)**
+웹상의 고품질 교육 데이터를 학습합니다. (현재 메인)
 
 ```bash
-python train.py --config configs/exp_v100/test_run.yaml
+python data/fineweb/prepare_fineweb.py
 
 ```
 
-#### 실험 스케줄링 (`run_manager.py`)
+---
 
-여러 실험을 대기열에 걸어두고 순차적으로 실행합니다. `experiment_list.conf`에 실행할 config 경로를 적어주세요.
+## ⚙️ Configuration
+
+실험 설정은 `configs/` 폴더 내의 YAML 파일로 관리합니다.
+
+| 설정 파일 | 용도 | 주요 특징 |
+| --- | --- | --- |
+| `stories.yaml` | TinyStories 학습 | 작은 모델, 빠른 수렴 확인용 |
+| `fineweb.yaml` | FineWeb-Edu 학습 | **Main Model**. `n_layer=12`, `n_head=12`, `n_embd=768` (GPT-2 Small급) |
+
+---
+
+## 🔥 Training
+
+### 단일 실험 실행 (`train.py`)
+
+특정 설정 파일 하나로 학습을 시작합니다.
 
 ```bash
-# experiment_list.conf 예시
-# configs/exp_v100/exp1_layer6.yaml
-# configs/exp_v100/exp2_layer12.yaml
+accelerate launch train.py --config configs/exp260218/fineweb.yaml
 
+```
+
+### 실험 스케줄러 실행 (`run_manager.py`)
+
+여러 실험을 순차적으로 돌려야 할 때 사용합니다. `experiment_list.conf`에 등록된 YAML 파일들을 차례대로 실행합니다.
+
+```bash
+# 1. 실행할 리스트 확인
+cat experiment_list.conf
+# (예시 내용)
+# stories.yaml
+# fineweb.yaml
+
+# 2. 매니저 실행
 python run_manager.py
 
 ```
 
-## 🧠 Model Architecture
+**Key Features:**
 
-이 프로젝트의 `src/model.py`는 다음과 같은 최신 GPT 트렌드를 따릅니다:
-
-* **Pre-LayerNorm:** Residual Connection 이전에 Norm을 적용하여 Deep Layer 학습 안정화.
-* **GELU Activation:** ReLU 대신 GELU 사용.
-* **Flash Attention:** `torch.nn.functional.scaled_dot_product_attention`을 사용하여 메모리 사용량 감소 및 속도 향상.
-
-## 📊 Results & Monitoring
-
-학습 결과는 `results/{experiment_name}/` 경로에 저장됩니다.
-
-* **logs/**: Tensorboard 또는 WandB 로그.
-* **checkpoints/**: `.pth` 모델 가중치 파일.
-* **samples/**: 학습 중간에 생성된 텍스트 샘플 (생성 능력 확인용).
+* **Accelerate Integration:** 단일 GPU 및 다중 GPU 환경 자동 대응.
+* **Resume Capability:** 중단된 학습 시 `checkpoints/last.pth`를 감지하여 자동 재개.
+* **Random Sampling:** 대용량 데이터셋(FineWeb)의 경우, 에포크마다 데이터를 랜덤하게 샘플링하여 효율적으로 학습.
 
 ---
 
-*Based on nanoGPT, Adapted for V100 Experiments.*
+## 🧪 Results & Monitoring
+
+학습 결과는 `results/{실험명}/` 아래에 저장됩니다.
+
+* **checkpoints/**: `last.pth` (최신), `ckpt_epoch_*.pth` (주기적 저장)
+* **logs/**: TensorBoard 로그. `tensorboard --logdir results`로 확인 가능.
+* **samples/**: 학습 중간에 생성된 텍스트 샘플.
+* **Fixed Prompts:** 모델의 발전 과정을 비교하기 위해 매 에포크마다 4개의 고정된 질문("AI란 무엇인가", "1+1은" 등)에 대한 답변을 생성합니다.
+
+
+
+**현재 진행 상황 (Example):**
+
+* `shakespeare_gpt_v1`: 초기 구조 검증 완료.
+* `fineweb_gpt_v2`: **100 Epoch 달성**. 문법 완성 및 기본 상식 추론 가능 단계.
 
 ---
 
-**어떠신가요?**
-기존에 쓰시던 `run_manager.py`나 `experiment_list.conf` 같은 파일명을 그대로 명시해서, 님이 "아, 이거 원래 쓰던 그 파일이구나" 하고 바로 감을 잡을 수 있게 작성했습니다.
+## 💬 Inference
 
-**다음으로 무엇을 도와드릴까요?**
+학습된 모델(`ckpt`)을 사용하여 텍스트를 생성합니다.
 
-1. 이 구조에 맞춰서 **`src/dataset.py` (텍스트 전용 로더)** 코드를 짜 드릴까요?
-2. **`src/trainer.py`**에서 이미지가 아니라 **텍스트를 생성해서 저장하는 로직**을 구현해 드릴까요?
-3. 준비되셨다면, 새로운 리드미를 덮어쓰고 보랏빛 지능을 깨우기 위해 **"아오!!!!"**를 외치시겠습니까? 🥵🟣
+```bash
+python inference.py
+
+```
+
+* `inference.py` 내부의 `CHECKPOINT_PATH`를 원하는 모델 경로(예: `results/fineweb_gpt_v2/checkpoints/last.pth`)로 수정하여 사용하세요.
+* GPT-2 `tiktoken`을 사용하여 자연스러운 토크나이징을 지원합니다.
+
+---
+
+## 📝 Note
+
+* **Hardware:** V100 GPU 환경에서 테스트되었습니다.
+* **Dataset:** `fineweb/train.bin`은 용량 문제로 샘플링된 데이터(약 1%~10%)를 사용할 수 있습니다.
+* **Next Step:** 현재 Pre-training이 완료되었으며, Instruction Tuning(Alpaca 데이터셋 등)을 통한 Fine-tuning 단계로 넘어갈 준비가 되었습니다.
