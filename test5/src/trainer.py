@@ -229,3 +229,34 @@ class Trainer:
             print(f"\n>>> [Epoch {epoch:04d}] Fixed samples saved to {save_path}")
             
         self.model.train()
+
+    def save_checkpoint(self, epoch, loss):
+        """체크포인트 저장"""
+        # Config 객체가 Namespace일 수도, dict일 수도 있으므로 처리
+        conf_to_save = self.config
+        if hasattr(self.config, '__dict__'):
+            conf_to_save = vars(self.config)
+
+        state = {
+            'epoch': epoch,
+            'model_state': self.accelerator.unwrap_model(self.model).state_dict(),
+            'optimizer_state': self.optimizer.state_dict(),
+            'config': conf_to_save,
+            'loss': loss
+        }
+        
+        filename = self.ckpt_dir / f"ckpt_epoch_{epoch:04d}.pth"
+        torch.save(state, filename)
+        torch.save(state, self.ckpt_dir / "last.pth")
+        
+        # 오래된 파일 정리
+        self._cleanup_old_checkpoints()
+
+    def _cleanup_old_checkpoints(self, keep_num=3):
+        try:
+            all_ckpts = sorted(self.ckpt_dir.glob("ckpt_epoch_*.pth"))
+            if len(all_ckpts) > keep_num:
+                for ckpt in all_ckpts[:-keep_num]:
+                    ckpt.unlink()
+        except Exception as e:
+            print(f"Cleanup failed: {e}")
