@@ -1,0 +1,35 @@
+# [실험 관리] run_manager 및 Trainer가 폴더 생성 시 사용하는 최상위 이름
+
+# [시스템]
+system:
+  experiment_name: "fineweb_gpt_v2"
+  seed: 1337
+
+# [데이터] 
+data:
+  data_dir: "data/fineweb" # prepare.py가 .bin 파일을 만든 경로
+  # dataset: "tinystories"
+
+# [모델] TinyStories 전용 GPT-2 아키텍처
+model:
+  n_layer: 12
+  n_head: 12
+  n_embd: 384
+  block_size: 256    # TinyStories는 문장이 좀 더 길어서 512 추천 (기존 256)
+  vocab_size: 50304  # GPT-2(50257)를 GPU 연산에 최적화(64배수)한 크기 ★필수 수정
+  dropout: 0.0       # 학습 시 데이터가 충분하므로 0.0~0.1 사이 추천
+  bias: true         # GPT-2 표준 레이아웃 적용
+
+# [학습] V100 1대 최적화 세팅
+train:
+  epochs: 100         # 데이터셋이 크므로 50~100 에포크면 충분히 말을 트기 시작함
+  save_interval: 5   # 5 에포크마다 체크포인트 및 텍스트 샘플 생성
+  
+  batch_size: 64     # V100 VRAM(16GB/32GB) 상황에 맞춰 64~128 사이 조절
+  learning_rate: 6e-4 # 데이터셋이 커지면 1e-3보다 약간 낮추는 것이 안정적 (6e-4 ~ 1e-3)
+  weight_decay: 1e-1 # 가중치 감쇠 (L2 정규화와 유사함)
+  
+  # 옵티마이저 하이퍼파라미터
+  beta1: 0.9
+  beta2: 0.95        # GPT-2/3 논문 표준값 (0.95~0.99)
+  grad_clip: 1.0     # 그래디언트 폭주 방지용 임계값

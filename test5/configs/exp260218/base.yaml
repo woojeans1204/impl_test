@@ -1,0 +1,33 @@
+# [시스템 설정]
+system:
+  experiment_name: "shakespeare_gpt_v1"  # 결과 폴더명 & 슬랙 알림 이름
+  seed: 1337
+
+# [데이터 설정]
+data:
+  data_dir: "data/shakespeare" # .bin 파일 위치
+
+# [모델 설정] - GPT 구조
+model:
+  block_size: 256   # == seq_len (문맥 길이)
+  vocab_size: 50304    # prepare.py 결과값 (셰익스피어는 65)
+  n_layer: 6        # 층 개수
+  n_head: 6         # 헤드 개수
+  n_embd: 384       # 임베딩 차원
+  dropout: 0.0      # Pre-training은 0 추천
+
+# [학습 설정]
+train:
+  # RunManager 호환성 핵심 (이게 있어야 슬랙에 %가 뜸)
+  epochs: 100
+  save_interval: 5  # 5 에포크마다 저장
+  
+  # 배치 & 학습률
+  batch_size: 64     # V100 메모리에 맞춰 조절
+  learning_rate: 1e-3
+  weight_decay: 1e-1 # GPT 성능 핵심
+  
+  # 기타 (기본값 사용 시 생략 가능하지만 명시함)
+  grad_clip: 1.0
+  beta1: 0.9
+  beta2: 0.99
