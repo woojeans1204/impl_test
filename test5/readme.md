@@ -2,6 +2,10 @@
 
 `src/diffusion.py`는 제거하거나 `src/model.py`로 기능이 통합된 것으로 가정하고 작성했습니다.
 
+conda create -n study python=3.10 -y
+conda activate study
+pip install -r requirements.txt
+
 ---
 
 # NanoGPT V100 Framework
