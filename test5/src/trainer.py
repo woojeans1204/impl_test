@@ -171,58 +171,61 @@ class Trainer:
         self.model.eval()
         raw_model = self.accelerator.unwrap_model(self.model)
         
-        start_token = torch.zeros((1, 1), dtype=torch.long, device=self.device)
-        y_gen = raw_model.generate(start_token, max_new_tokens=200, temperature=0.8)
-        
-        # [수정] 숫자 리스트 -> 텍스트 변환
-        token_ids = y_gen[0].tolist()
-        if self.itos:
-            # 수제 단어장(pkl) 방식
-            generated_text = "".join([self.itos[i] for i in token_ids])
-        elif self.enc:
-            # 표준 토크나이저(tiktoken) 방식
-            generated_text = self.enc.decode(token_ids)
-        else:
-            generated_text = str(token_ids)
-        
+        # [수정] 모델의 성장 과정을 비교하기 위한 '고정 프롬프트' 4종
+        prompts = [
+            "Artificial Intelligence is",          # 1. 정의 및 설명 능력
+            "The capital of France is Paris, and", # 2. 지식 확장 능력
+            "Once upon a time,",                   # 3. 스토리텔링 능력
+            "1 + 1 = 2, 2 + 2 ="                   # 4. 기초 논리/수학 능력
+        ]
+
         save_path = self.sample_dir / f"sample_epoch_{epoch:04d}.txt"
+        
         with open(save_path, "w", encoding='utf-8') as f:
-            f.write(f"Epoch {epoch:04d} Generated:\n")
-            f.write("=" * 50 + "\n")
-            f.write(generated_text)
+            f.write(f"Epoch {epoch:04d} Sampling Result\n")
+            f.write("=" * 50 + "\n\n")
+
+            for prompt in prompts:
+                # 1. 프롬프트 인코딩
+                if self.enc:
+                    # Tiktoken (FineWeb, Chat) 방식
+                    start_ids = self.enc.encode(prompt)
+                else:
+                    # pkl (Shakespeare) 방식: 
+                    # __init__에 stoi가 없으므로 안전하게 0번 토큰으로 시작
+                    start_ids = [0] 
+                
+                # 텐서 변환 및 GPU 할당
+                x = torch.tensor(start_ids, dtype=torch.long, device=self.device).unsqueeze(0)
+
+                # 2. 시드 고정 (중요!)
+                # 매번 똑같은 난수 조건에서 생성해야 순수 모델 성능 변화를 비교 가능
+                if self.device.type == 'cuda':
+                    torch.cuda.manual_seed(42)
+                torch.manual_seed(42)
+                
+                # 3. 텍스트 생성 (Temperature 0.7로 설정하여 너무 엉뚱한 말 방지)
+                y_gen = raw_model.generate(x, max_new_tokens=100, temperature=0.7)
+                
+                # 4. 디코딩 (숫자 -> 텍스트)
+                token_ids = y_gen[0].tolist()
+                if self.itos:
+                    generated_text = "".join([self.itos[i] for i in token_ids])
+                else:
+                    generated_text = self.enc.decode(token_ids)
+                
+                # 5. 결과 파일 기록
+                # tiktoken 사용 시 프롬프트 텍스트를 제외한 뒷부분만 깔끔하게 저장
+                if self.enc:
+                    output_text = generated_text[len(prompt):]
+                else:
+                    output_text = generated_text
+
+                f.write(f"[Prompt]: {prompt}\n")
+                f.write(f"[Output]: {output_text}\n")
+                f.write("-" * 30 + "\n\n")
             
         if self.accelerator.is_main_process:
-            print(f"\n>>> [Epoch {epoch:04d}] Sample: {generated_text[:50]}...")
+            print(f"\n>>> [Epoch {epoch:04d}] Fixed samples saved to {save_path}")
             
         self.model.train()
-
-    def save_checkpoint(self, epoch, loss):
-        """체크포인트 저장"""
-        # Config 객체가 Namespace일 수도, dict일 수도 있으므로 처리
-        conf_to_save = self.config
-        if hasattr(self.config, '__dict__'):
-            conf_to_save = vars(self.config)
-
-        state = {
-            'epoch': epoch,
-            'model_state': self.accelerator.unwrap_model(self.model).state_dict(),
-            'optimizer_state': self.optimizer.state_dict(),
-            'config': conf_to_save,
-            'loss': loss
-        }
-        
-        filename = self.ckpt_dir / f"ckpt_epoch_{epoch:04d}.pth"
-        torch.save(state, filename)
-        torch.save(state, self.ckpt_dir / "last.pth")
-        
-        # 오래된 파일 정리
-        self._cleanup_old_checkpoints()
-
-    def _cleanup_old_checkpoints(self, keep_num=3):
-        try:
-            all_ckpts = sorted(self.ckpt_dir.glob("ckpt_epoch_*.pth"))
-            if len(all_ckpts) > keep_num:
-                for ckpt in all_ckpts[:-keep_num]:
-                    ckpt.unlink()
-        except Exception as e:
-            print(f"Cleanup failed: {e}")

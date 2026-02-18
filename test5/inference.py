@@ -55,7 +55,7 @@ if __name__ == "__main__":
     CONFIG_PATH = RESULT_PATH / "config.yaml"
     CHECKPOINT_PATH = RESULT_PATH / "checkpoints/last.pth"
     
-    user_prompt = "Spiderman's name is "
+    user_prompt = "how to be good at football?"
     # user_prompt = input()
     
     generate_text(CONFIG_PATH, CHECKPOINT_PATH, user_prompt)
