@@ -1,5 +1,8 @@
 import os
+import sys
 os.environ['HF_HOME'] = '/scratch/x3326a36/hf_cache' # 적절히 바꾸기
+# 현재 파일(scripts/...)의 부모 폴더(project_root)를 경로에 추가
+sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 import torch
 from src.model import GPT, GPTConfig
 from transformers import GPT2LMHeadModel
