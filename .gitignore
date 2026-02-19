@@ -3,8 +3,6 @@ data/
 datasets/
 *.zip
 *.tar.gz
-!data/**/*.py
-!datasets/**/*.py
 
 # 학습 결과물 및 모델 체크포인트
 outputs/
