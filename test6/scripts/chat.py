@@ -10,7 +10,7 @@ from src.model import GPT, GPTConfig
 # ==========================================
 # 1. 설정
 # ==========================================
-CHECKPOINT_PATH = "results/nanogpt_alpaca_finetune/checkpoints/last.pth"
+CHECKPOINT_PATH = "results/gpt_large_alpaca_finetune/checkpoints/last.pth"
 DEVICE = 'cuda' if torch.cuda.is_available() else 'cpu'
 
 # ==========================================

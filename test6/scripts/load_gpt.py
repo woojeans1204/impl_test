@@ -1,4 +1,5 @@
 import os
+os.environ['HF_HOME'] = '/scratch/x3326a36/hf_cache' # 적절히 바꾸기
 import sys
 current_dir = os.path.dirname(os.path.abspath(__file__))
 parent_dir = os.path.dirname(current_dir)
@@ -71,4 +72,5 @@ def load_any_gpt2(model_type="gpt2-medium"):
 
 if __name__ == "__main__":
     # 원하는 모델로 바꿔서 실행하세요!
-    load_any_gpt2("gpt2-large")
+    # load_any_gpt2("gpt2-large")
+    load_any_gpt2("gpt2-xl")
