@@ -55,7 +55,8 @@ def load_any_gpt2(model_type="gpt2-medium"):
                 sd[k].copy_(sd_hf[k])
 
     # 저장 경로 설정
-    save_dir = f"results/{model_type.replace('-', '_')}_base/checkpoints"
+    base_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+    save_dir = os.path.join(base_dir, "results", f"{model_type.replace('-', '_')}_base", "checkpoints")
     os.makedirs(save_dir, exist_ok=True)
     save_path = os.path.join(save_dir, "last.pth")
 

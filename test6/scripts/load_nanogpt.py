@@ -54,7 +54,8 @@ def load_original_nanogpt():
                 sd[k].copy_(sd_hf[k])
 
     print(">>> 5. 'last.pth'로 저장 (Trainer가 읽을 수 있게)")
-    save_dir = "results/nanogpt_base/checkpoints"
+    base_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+    save_dir = os.path.join(base_dir, "results", "nanogpt_base", "checkpoints")
     os.makedirs(save_dir, exist_ok=True)
     save_path = os.path.join(save_dir, "last.pth")
 

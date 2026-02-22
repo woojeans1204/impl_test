@@ -63,10 +63,9 @@ def generate_text(checkpoint_path, prompt, max_new_tokens=200, temperature=0.7):
 if __name__ == "__main__":
     # [설정] 베이스 모델 경로 (load_nanogpt.py가 저장한 곳)
     # config.yaml은 필요 없습니다. last.pth 안에 다 있습니다.
-    CHECKPOINT_PATH = "results/nanogpt_base/checkpoints/last.pth"
-    user_prompt = "Christano Ronaldo? or Lionel Messi? who is better?"
-    # user_prompt = "the most important thing in life is"
-    # user_prompt = input()
+    CHECKPOINT_PATH = "../results/gpt2_large_base/checkpoints/last.pth"
+    user_prompt = "the captial of korea is"
+    user_prompt = input()
 
     if not os.path.exists(CHECKPOINT_PATH):
         print(f"Error: {CHECKPOINT_PATH} not found.")
