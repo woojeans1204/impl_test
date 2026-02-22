@@ -125,15 +125,15 @@ class Trainer:
         
         # 3. [핵심 수정] 옵티마이저 상태가 '진짜로 있을 때만' 로드
         # 우리가 만든 베이스 모델은 optimizer_state가 {} 비어있으므로, 이 부분을 건너뛰어야 함
-        opt_state = checkpoint.get('optimizer_state')
-        if opt_state and len(opt_state) > 0:
-            try:
-                self.optimizer.load_state_dict(opt_state)
-            except Exception as e:
-                print(f">>> [Warning] Optimizer load failed (ignoring): {e}")
-        else:
-            if self.accelerator.is_main_process:
-                print(">>> [Info] Optimizer state is empty. Starting with a fresh optimizer.")
+        # opt_state = checkpoint.get('optimizer_state')
+        # if opt_state and len(opt_state) > 0:
+        #     try:
+        #         self.optimizer.load_state_dict(opt_state)
+        #     except Exception as e:
+        #         print(f">>> [Warning] Optimizer load failed (ignoring): {e}")
+        # else:
+        #     if self.accelerator.is_main_process:
+        #         print(">>> [Info] Optimizer state is empty. Starting with a fresh optimizer.")
             
         # 4. 에포크 설정
         self.start_epoch = checkpoint['epoch'] + 1
