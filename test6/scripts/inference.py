@@ -2,6 +2,10 @@ import torch
 import tiktoken
 from src.model import GPT, GPTConfig # GPTConfig도 임포트 필요할 수 있음
 import os
+import sys
+current_dir = os.path.dirname(os.path.abspath(__file__)) # scripts 폴더
+parent_dir = os.path.dirname(current_dir)               # 상위 폴더 (test6)
+sys.path.append(parent_dir)
 
 def generate_text(checkpoint_path, prompt, max_new_tokens=200, temperature=0.7):
     device = 'cuda' if torch.cuda.is_available() else 'cpu'

@@ -2,7 +2,9 @@ import torch
 import tiktoken
 import os
 import sys
-
+current_dir = os.path.dirname(os.path.abspath(__file__)) # scripts 폴더
+parent_dir = os.path.dirname(current_dir)               # 상위 폴더 (test6)
+sys.path.append(parent_dir)
 # src 폴더 인식을 위해 경로 추가
 sys.path.append(os.path.dirname(os.path.abspath(__file__)))
 from src.model import GPT, GPTConfig 
