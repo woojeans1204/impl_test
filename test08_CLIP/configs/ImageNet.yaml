@@ -1,0 +1,28 @@
+model:
+  name: "ViT-B-32"
+  pretrained: "openai"
+
+data:
+  name: "ImageNet"
+  root: "../data"
+  batch_size: 256
+  num_workers: 4
+
+logging:
+  num_samples: 10
+
+prompts:
+  - "a bad photo of a {}."
+  - "a photo of many {}."
+  - "a sculpture of a {}."
+  - "a hard to see photo of a {}."
+  - "a low resolution photo of the {}."
+  - "a rendering of a {}."
+  - "graffiti of a {}."
+  - "a bad photo of the {}."
+  - "a cropped photo of the {}."
+  - "a photo of a hard to see {}."
+  - "a bright photo of a {}."
+  - "a photo of a clean {}."
+  - "a photo of a dirty {}."
+  - "a dark photo of the {}."

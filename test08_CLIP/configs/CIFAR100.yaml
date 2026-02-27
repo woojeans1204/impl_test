@@ -1,0 +1,18 @@
+model:
+  name: "ViT-B-32"
+  pretrained: "openai"
+
+data:
+  name: "CIFAR100"
+  root: "../data"
+  batch_size: 256
+  num_workers: 4
+
+logging:
+  num_samples: 10
+  
+prompts:
+  - "a photo of a {}."
+  - "a pixelated photo of a {}."
+  - "a bad photo of a {}."
+  - "a good photo of a {}."

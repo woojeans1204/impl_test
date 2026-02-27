@@ -10,3 +10,14 @@ python-dotenv
 tiktoken
 datasets
 transformers
+open_clip_torch
+scipy
+openai
+wikipedia
+langchain
+langchain-openai
+langgraph
+duckduckgo-search
+langchain-community
+ddgs
+langchain-experimental
