@@ -12,7 +12,7 @@ sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 from src.controller import adapt
 from src.tools import llm
 
-load_dotenv()
+load_dotenv('../.env')
 
 def load_data():
     print("📥 Ko-StrategyQA 로드 중...")
