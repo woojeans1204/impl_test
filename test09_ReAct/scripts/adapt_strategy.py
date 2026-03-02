@@ -83,9 +83,9 @@ def run_executor(task: str, context: str) -> str:
             "messages": [SystemMessage(content=system_prompt), HumanMessage(content=prompt)]
         }, {"recursion_limit": 10}) 
         
-        # print("\n    [🔍 Executor 사고 흐름]")
-        # for msg in result["messages"]:
-        #     if msg.type in ["ai", "tool"]: msg.pretty_print()
+        print("\n    [🔍 Executor 사고 흐름]")
+        for msg in result["messages"]:
+            if msg.type in ["ai", "tool"]: msg.pretty_print()
         return result["messages"][-1].content
     except Exception as e:
         return f"Executor Failure: {e}"
@@ -190,7 +190,7 @@ if __name__ == "__main__":
 
     score = 0
     total = 5
-    start_idx = 10
+    start_idx = 0
 
     for i, item in enumerate(dataset.select(range(start_idx, start_idx+total)), 1):
         question = item['question']

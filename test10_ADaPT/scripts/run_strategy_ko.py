@@ -10,6 +10,7 @@ from dotenv import load_dotenv
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 from src.controller import adapt
+from src.controller_adv import adapt_adv
 from src.tools import llm
 
 load_dotenv('../.env')
@@ -31,8 +32,8 @@ def load_data():
 
 if __name__ == "__main__":
     dataset = load_data()
-    score, total = 0, 5
-    start_idx = 10
+    score, total = 0, 20
+    start_idx = 0
 
     for i, item in enumerate(dataset.select(range(start_idx, start_idx+total)), 1):
         question = item['question']
@@ -40,7 +41,7 @@ if __name__ == "__main__":
         
         print(f"\n" + "="*80 + f"\n📝 [문제 {i}/{total}] {question}\n🔑 정답: {correct_answer}\n" + "="*80)
         
-        success, info = adapt(question, "", 0, 3)
+        success, info = adapt_adv(question, "", 0, 3)
         final_ans = llm.invoke(f"정보: {info}\n질문: {question}\n답: yes or no?").content.strip().lower()
         
         print(f"\n🤖 제출: {final_ans}")

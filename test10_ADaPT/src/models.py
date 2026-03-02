@@ -7,4 +7,4 @@ class EvaluatorOutput(BaseModel):
 
 class PlannerOutput(BaseModel):
     operator: Literal["AND", "OR"] = Field(description="논리 관계")
-    sub_tasks: List[str] = Field(description="구체적인 하위 작업 (최대 3개)")
+    sub_tasks: List[str] = Field(description="구체적인 하위 작업 (2개)")
